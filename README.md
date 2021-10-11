@@ -1,5 +1,5 @@
 # MergeDOTNETTestReport
-Merge Result HTML report from dotnet test command (Section Summmary) into one file
+Merge HTML report from dotnet test command (Section Summmary) into one file
 
 ## How to use
 * Command Template
