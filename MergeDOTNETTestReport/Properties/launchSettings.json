@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "MergeDOTNETTestReport": {
+      "commandName": "Project",
+      "commandLineArgs": "-inputpath C:\\Users\\Chatr\\Desktop\\TestResult -outputpath C:\\Users\\Chatr\\Desktop\\TestResult -reportname TestSummary.html"
+    }
+  }
+}
