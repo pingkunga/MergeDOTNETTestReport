@@ -18,3 +18,6 @@ D:\\06Utility\\MergeDOTNETTestReport\\MergeDOTNETTestReport.exe -inputpath D:\\0
 
 ![2021-10-12_063012](https://user-images.githubusercontent.com/9116276/136867802-00ab7d2e-cb38-4711-9b16-ecef9e35fbd9.jpg)
 
+## Blog
+* https://naiwaen.debuggingsoft.com/2022/01/net-merge-dotnet-test-report/
+
