@@ -1,6 +1,7 @@
 ﻿using HtmlAgilityPack;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 
@@ -12,6 +13,9 @@ namespace MergeDOTNETTestReport
         public const string PARAM_OUTPUTPATH    = "-outputpath";
         public const string PARAM_REPORTNAME    = "-reportname";
 
+        private static int TotalPass = 0;
+        private static int TotalFail = 0;
+        private static int TotalSkip = 0;
 
         /// <summary>
         /// -inputpath
@@ -24,7 +28,7 @@ namespace MergeDOTNETTestReport
             HtmlDocument doc = new HtmlDocument();
             HtmlNode htmlNode = HtmlNode.CreateNode("<html>");
             HtmlNode bodyNode = HtmlNode.CreateNode("<body>");
-
+            HtmlNode testDetailNode = HtmlNode.CreateNode("<div>");
             IDictionary<string, string> inputDic = convertInputDic(args);
 
             String finalPath = inputDic[PARAM_OUTPUTPATH] + "\\" + inputDic[PARAM_REPORTNAME];
@@ -45,11 +49,32 @@ namespace MergeDOTNETTestReport
             HtmlNode styleNode = getStyleSection(testReportFiles.First());
             htmlNode.AppendChild(scriptNode);
             htmlNode.AppendChild(styleNode);
+
+
             foreach (string testReportFile in testReportFiles)
             {
                 HtmlNode testReportSummrary = getSummarySection(testReportFile);
-                bodyNode.AppendChild(testReportSummrary);
+                testDetailNode.AppendChild(testReportSummrary);
             }
+
+            String rawSummaryHtml = @" <div id=""TestSummary"" class=""summary"">
+                                        </br>
+                                        <div class=""block"">
+                                            <h1>Total Test</h1>
+                                            <span>Passed  : </span>
+                                            <span class=""passedTests"">{0}</span></br>
+                                            <span>Failed  : </span>
+                                            <span class=""failedTests"">{1}</span></br>
+                                            <span>Skipped : </span>
+                                            <span class=""skippedTests"">{2}</span></br>
+                                        </div>
+                                       </div>";
+            rawSummaryHtml = String.Format(rawSummaryHtml, TotalPass, TotalFail, TotalSkip);
+            HtmlNode testSummaryNode = HtmlNode.CreateNode(rawSummaryHtml);
+
+
+            bodyNode.ChildNodes.Add(testSummaryNode);
+            bodyNode.ChildNodes.Add(testDetailNode);
 
             htmlNode.AppendChild(bodyNode);
 
@@ -90,7 +115,16 @@ namespace MergeDOTNETTestReport
             htmlDoc.LoadHtml(rawHTML);
 
             HtmlNodeCollection summary = htmlDoc.DocumentNode.SelectNodes("//div[contains(@class, 'summary')]");
+            HtmlNodeCollection PassTest = summary.Select(c1 => c1.SelectNodes("//span[contains(@class, 'passedTests')]")).First();
+            TotalPass = TotalPass + Convert.ToInt32(PassTest[0].InnerHtml);
 
+            HtmlNodeCollection FailTest = summary.Select(c1 => c1.SelectNodes("//span[contains(@class, 'failedTests')]")).First();
+            TotalFail = TotalFail + Convert.ToInt32(FailTest[0].InnerHtml);
+
+            HtmlNodeCollection SkipTest = summary.Select(c1 => c1.SelectNodes("//span[contains(@class, 'skippedTests')]")).First();
+            TotalSkip = TotalSkip + Convert.ToInt32(SkipTest[0].InnerHtml);
+
+            //TotalF
             HtmlNodeCollection testFilels = htmlDoc.DocumentNode.SelectNodes("//div[contains(@class, 'list-row')]");
             String testDLLName = "Dummy";
             foreach(HtmlNode testfile in testFilels)

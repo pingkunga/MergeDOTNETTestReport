@@ -2,7 +2,7 @@
   "profiles": {
     "MergeDOTNETTestReport": {
       "commandName": "Project",
-      "commandLineArgs": "-inputpath C:\\Users\\Chatr\\Desktop\\TestResult -outputpath C:\\Users\\Chatr\\Desktop\\TestResult -reportname TestSummary.html"
+      "commandLineArgs": "-inputpath \"D:\\2WarRoom\\1SlideProject\\MergeDOTNETTestReport\\ResultHTML\" -outputpath \"D:\\2WarRoom\\1SlideProject\\MergeDOTNETTestReport\\ResultHTML\" -reportname TestSummary.html                           \r\n"
     }
   }
 }
