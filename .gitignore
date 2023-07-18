@@ -5,3 +5,5 @@ obj
 *.bak
 MigrationBackup
 packages
+*.html
+*.zip

@@ -1,7 +1,6 @@
 ﻿using HtmlAgilityPack;
 using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.IO;
 using System.Linq;
 
@@ -54,7 +53,10 @@ namespace MergeDOTNETTestReport
             foreach (string testReportFile in testReportFiles)
             {
                 HtmlNode testReportSummrary = getSummarySection(testReportFile);
-                testDetailNode.AppendChild(testReportSummrary);
+                if (testReportSummrary != null)
+                {
+                    testDetailNode.AppendChild(testReportSummrary);
+                }
             }
 
             String rawSummaryHtml = @" <div id=""TestSummary"" class=""summary"">
@@ -127,17 +129,23 @@ namespace MergeDOTNETTestReport
             //TotalF
             HtmlNodeCollection testFilels = htmlDoc.DocumentNode.SelectNodes("//div[contains(@class, 'list-row')]");
             String testDLLName = "Dummy";
-            foreach(HtmlNode testfile in testFilels)
-            {
-                String value = testfile.InnerText;
-                if (value.Contains(".dll"))
+            if (testFilels != null)
+            {  
+                foreach (HtmlNode testfile in testFilels)
                 {
-                    //Create new tag
-                    testDLLName = Path.GetFileName(value);
-                    break;
+                    String value = testfile.InnerText;
+                    if (value.Contains(".dll"))
+                    {
+                        //Create new tag
+                        testDLLName = Path.GetFileName(value);
+                        break;
+                    }
                 }
             }
-
+            else
+            {
+                testDLLName=Path.GetFileName(pPath);
+            }
             HtmlNode dllTestSummary = htmlDoc.CreateElement("div");
             HtmlNode h2Node = HtmlNode.CreateNode("<h2> Test Run: " + testDLLName + " </h2>");
             dllTestSummary.AppendChild(h2Node);
