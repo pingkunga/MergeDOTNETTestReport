@@ -24,11 +24,52 @@ namespace MergeDOTNETTestReport
         /// <param name="args"></param>
         static void Main(string[] args)
         {
+            // Check if any arguments are passed
+            if (args.Length == 0)
+            {
+                Console.WriteLine("No arguments provided more info use -h");
+                return;
+            }
+
+            if (args.Contains("-v"))
+            {
+                // Get Application Version from Assembly
+                Console.WriteLine("Version: " + System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString());
+                return;
+            }
+
+            if (args.Contains("-h"))
+            {
+                Console.WriteLine("-h for help");
+                Console.WriteLine("-v for get version");
+                Console.WriteLine("Sample usage");
+                Console.WriteLine("MergeDOTNETTestReport -inputpath <path_to_html_dotnet_test_report> -outputpath <path> -reportname <name>.html");
+                return;
+            }
+
             HtmlDocument doc = new HtmlDocument();
             HtmlNode htmlNode = HtmlNode.CreateNode("<html>");
             HtmlNode bodyNode = HtmlNode.CreateNode("<body>");
             HtmlNode testDetailNode = HtmlNode.CreateNode("<div>");
             IDictionary<string, string> inputDic = convertInputDic(args);
+
+            if (!inputDic.ContainsKey(PARAM_INPUTPATH) || !inputDic.ContainsKey(PARAM_OUTPUTPATH) || !inputDic.ContainsKey(PARAM_REPORTNAME))
+            {
+                Console.WriteLine("Invalid input parameters for MergeDOTNETTestReport");
+                return;
+            }
+
+            if (!Directory.Exists(inputDic[PARAM_INPUTPATH]))
+            {
+                Console.WriteLine("Input path does not exist");
+                return;
+            }
+
+            if (!Directory.Exists(inputDic[PARAM_OUTPUTPATH]))
+            {
+                Console.WriteLine("Output path does not exist");
+                return;
+            }
 
             String finalPath = inputDic[PARAM_OUTPUTPATH] + "\\" + inputDic[PARAM_REPORTNAME];
             if (File.Exists(finalPath))
@@ -46,10 +87,16 @@ namespace MergeDOTNETTestReport
 
             HtmlNode scriptNode = getScriptSection(testReportFiles.First());
             HtmlNode styleNode = getStyleSection(testReportFiles.First());
-            htmlNode.AppendChild(scriptNode);
-            htmlNode.AppendChild(styleNode);
+            if (scriptNode != null)
+            {
+                htmlNode.AppendChild(scriptNode);
+            }
 
-
+            if (styleNode != null)
+            {
+                htmlNode.AppendChild(styleNode);
+            }
+            
             foreach (string testReportFile in testReportFiles)
             {
                 HtmlNode testReportSummrary = getSummarySection(testReportFile);
@@ -163,7 +210,10 @@ namespace MergeDOTNETTestReport
             htmlDoc.LoadHtml(rawHTML);
 
             HtmlNodeCollection scriptNode = htmlDoc.DocumentNode.SelectNodes("//script");
-
+            if (scriptNode == null)
+            {
+                return null;
+            }
             return scriptNode[0];
 
         }
@@ -176,7 +226,10 @@ namespace MergeDOTNETTestReport
             htmlDoc.LoadHtml(rawHTML);
 
             HtmlNodeCollection styleNode = htmlDoc.DocumentNode.SelectNodes("//style");
-
+            if (styleNode == null)
+            {
+                return null;
+            }
             return styleNode[0];
 
         }
